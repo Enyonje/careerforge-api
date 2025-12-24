@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* ======================
+   CORE DOMAIN MODELS
+====================== */
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  fullName  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills UserSkill[]
+  roles  UserRole[]
+}
+
+model Skill {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  category    String
+  description String?
+  createdAt   DateTime @default(now())
+
+  users UserSkill[]
+  roles RoleSkill[]
+}
+
+enum RoleSeniority {
+  JUNIOR
+  MID
+  SENIOR
+  LEAD
+}
+
+model Role {
+  id        String        @id @default(uuid())
+  title     String
+  domain    String
+  level     Int
+  seniority RoleSeniority
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  skills RoleSkill[]
+  users  UserRole[]
+
+  @@unique([title, level])
+}
+
+model UserSkill {
+  id      String @id @default(uuid())
+  userId  String
+  skillId String
+  level   Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([userId, skillId])
+}
+
+model RoleSkill {
+  id            String @id @default(uuid())
+  roleId        String
+  skillId       String
+  requiredLevel Int
+
+  role  Role  @relation(fields: [roleId], references: [id])
+  skill Skill @relation(fields: [skillId], references: [id])
+
+  @@unique([roleId, skillId])
+}
+
+model UserRole {
+  id     String @id @default(uuid())
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@unique([userId, roleId])
+}

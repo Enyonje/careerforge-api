@@ -1,0 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.databaseConfig = void 0;
+exports.databaseConfig = {
+    url: process.env.DATABASE_URL,
+};
+//# sourceMappingURL=database.config.js.map
